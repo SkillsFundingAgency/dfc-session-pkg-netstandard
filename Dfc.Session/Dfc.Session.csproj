@@ -1,6 +1,39 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <ProjectGuid>{96E645E3-AE03-4534-92FA-D414FC4BD837}</ProjectGuid>
+    <CodeAnalysisRuleSet>../DFC.Digital.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+    <Authors>Education and Skills Funding Agency Team</Authors>
+    <Company>Education and Skills Funding Agency</Company>
+    <PackageDescription>Client for Session management</PackageDescription>
+    <PackageTags>Session</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>Copyright (c) 2020 Education and Skills Funding Agency Team</Copyright>
+    <Description>
+      Session client that provides session management functionality.
+      For details on how to use this package see the ReadMe file that is part of the repository.
+    </Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/SkillsFundingAgency/dfc-session-pkg-netstandard</RepositoryUrl>
+    <Version>1.0.0</Version>
   </PropertyGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="..\stylecop.json" Link="../stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hashids.net" Version="1.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>
