@@ -9,7 +9,7 @@ resources:
   - repository: dfc-devops
     type: github
     name: SkillsFundingAgency/dfc-devops
-    ref: refs/tags/v1.8.5
+    ref: refs/tags/v1.10.3
     endpoint: 'GitHub (ESFA)'
 
 pool:
@@ -24,9 +24,40 @@ stages:
   jobs:
   - job: BuildTestAndAnalyze
     steps:
+    - task: NuGetToolInstaller@0
+      inputs:
+        versionSpec: '>= 4.9.2'
+
     - template: AzureDevOpsTemplates\Build\StepTemplates\dfc-dotnetcore-build-sonar.yml@dfc-devops
       parameters:
         SolutionBaseName: $(SolutionBaseName)
         BuildPlatform: 'any cpu'
         BuildConfiguration: 'release'
         TestSuffix: UnitTests
+
+    - template: AzureDevOpsTemplates\Build\StepTemplates\dfc-dotnetcore-nuget-pack.yml@dfc-devops
+      parameters:
+        SolutionBaseName: $(SolutionBaseName)
+
+- stage: PublishPackage
+  displayName: Publish Package to NuGet
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - job: CleanArtifacts
+    displayName: Clean artifacts directory
+    workspace:
+      clean: all
+  - deployment: PublishNugetPackage
+    dependsOn: CleanArtifacts
+    environment: LiveService_NUGET
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: NuGetCommand@2
+            displayName: 'NuGet push'
+            inputs:
+              command: push
+              packagesToPush: '$(Pipeline.Workspace)\$(SolutionBaseName).Nuget\*.nupkg;!$(Pipeline.Workspace)\$(SolutionBaseName).Nuget\*.symbols.nupkg'
+              nuGetFeedType: external
+              publishFeedCredentials: 'DFC Nuget'
