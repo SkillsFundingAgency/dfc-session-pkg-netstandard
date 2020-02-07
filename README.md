@@ -37,7 +37,7 @@ To use this package, you must create a section in your appsettings in the follow
   ```
   "SessionConfig" : {
     "ApplicationName": "yourApplicationName",
-    "Salt" : "ncs" 
+    "Salt" : "somevalue" //optional parameter 
   }
   ```
 
