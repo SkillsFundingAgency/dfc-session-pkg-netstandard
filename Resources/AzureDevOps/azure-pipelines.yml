@@ -36,8 +36,8 @@ stages:
         TestSuffix: UnitTests
 
     - template: AzureDevOpsTemplates\Build\StepTemplates\dfc-dotnetcore-nuget-pack.yml@dfc-devops
-        parameters:
-          SolutionBaseName: $(SolutionBaseName)
+      parameters:
+        SolutionBaseName: $(SolutionBaseName)
 
 - stage: PublishPackage
   displayName: Publish Package to NuGet
