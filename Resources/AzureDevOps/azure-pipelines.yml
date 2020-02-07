@@ -24,24 +24,20 @@ stages:
   jobs:
   - job: BuildTestAndAnalyze
     steps:
+    - task: NuGetToolInstaller@0
+      inputs:
+        versionSpec: '>= 4.9.2'
+
     - template: AzureDevOpsTemplates\Build\StepTemplates\dfc-dotnetcore-build-sonar.yml@dfc-devops
       parameters:
         SolutionBaseName: $(SolutionBaseName)
         BuildPlatform: 'any cpu'
         BuildConfiguration: 'release'
         TestSuffix: UnitTests
-    - task: NuGetCommand@2
-      displayName: 'NuGet pack'
-      inputs:
-        command: pack
-        packagesToPack: '**/*.nuspec'
-        packDestination: '$(build.artifactstagingdirectory)\DeploymentPackages\Nuget'
-        versioningScheme: byEnvVar
-        versionEnvVar: GitVersion.MajorMinorPatch
-    - task: PublishPipelineArtifact@1
-      inputs:
-        targetPath: $(build.artifactstagingdirectory)\DeploymentPackages\Nuget
-        artifactName: $(SolutionBaseName).Nuget
+
+    - template: AzureDevOpsTemplates\Build\StepTemplates\dfc-dotnetcore-nuget-pack.yml@dfc-devops
+        parameters:
+          SolutionBaseName: $(SolutionBaseName)
 
 - stage: PublishPackage
   displayName: Publish Package to NuGet
