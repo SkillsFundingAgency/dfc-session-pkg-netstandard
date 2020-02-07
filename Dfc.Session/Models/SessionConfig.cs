@@ -4,6 +4,6 @@
     {
         public string ApplicationName { get; set; }
 
-        public string Salt { get; set; }
+        public string Salt { get; set; } = "ncs"
     }
 }
