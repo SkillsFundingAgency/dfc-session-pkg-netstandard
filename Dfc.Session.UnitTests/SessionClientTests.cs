@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -72,7 +73,7 @@ namespace Dfc.Session.UnitTests
             var userSession = new DfcUserSession();
 
             // Act
-            Assert.Throws<ArgumentException>(() => sessionClient.CreateCookie(userSession));
+            Assert.Throws<ArgumentException>(() => sessionClient.CreateCookie(userSession, true));
 
             // Assert
             A.CallTo(() => logger.Log(LogLevel.Warning, 0, A<FormattedLogValues>.Ignored, A<Exception>.Ignored, A<Func<object, Exception, string>>.Ignored)).MustHaveHappenedOnceExactly();
@@ -92,13 +93,36 @@ namespace Dfc.Session.UnitTests
             };
 
             // Act
-            sessionClient.CreateCookie(userSession);
+            sessionClient.CreateCookie(userSession, true);
             var headers = httpContextAccessor.HttpContext.Response.Headers;
             var setCookieHeader = headers["Set-Cookie"][0];
 
             // Assert
             Assert.True(headers.Count == 1);
             Assert.Contains(SessionName, setCookieHeader, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void CreateCookieAddsSetCookieHeaderWhenWithoutValidating()
+        {
+            // Arrange
+            var userSession = new DfcUserSession
+            {
+                SessionId = "DummySessionId",
+                Salt = "DummySalt",
+                CreatedDate = DateTime.UtcNow,
+                PartitionKey = "DummyPartitionKey",
+            };
+
+            // Act
+            sessionClient.CreateCookie(userSession, false);
+            var headers = httpContextAccessor.HttpContext.Response.Headers;
+            var setCookieHeader = headers[HeaderNames.SetCookie][0];
+
+            // Assert
+            Assert.True(headers.Count == 1);
+            Assert.Contains(SessionName, setCookieHeader, StringComparison.OrdinalIgnoreCase);
+            A.CallTo(() => sessionIdGenerator.ValidateSessionId(A<DfcUserSession>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]
