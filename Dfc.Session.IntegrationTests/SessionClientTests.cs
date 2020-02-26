@@ -55,7 +55,7 @@ namespace Dfc.Session.IntegrationTests
             contextAccessor.HttpContext = new DefaultHttpContext();
 
             // Act
-            sessionClient.CreateCookie(session);
+            sessionClient.CreateCookie(session, true);
 
             var headers = contextAccessor.HttpContext.Response.Headers;
             var setCookieHeader = headers["Set-Cookie"][0];

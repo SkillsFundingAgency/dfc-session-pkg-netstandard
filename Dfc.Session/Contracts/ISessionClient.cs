@@ -7,7 +7,7 @@ namespace Dfc.Session
     {
         DfcUserSession NewSession();
 
-        void CreateCookie(DfcUserSession userSession);
+        void CreateCookie(DfcUserSession userSession, bool validateSessionId);
 
         Task<string> TryFindSessionCode();
     }

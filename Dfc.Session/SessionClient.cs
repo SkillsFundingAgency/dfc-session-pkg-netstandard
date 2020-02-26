@@ -41,23 +41,24 @@ namespace Dfc.Session
             };
         }
 
-        public void CreateCookie(DfcUserSession userSession)
+        public void CreateCookie(DfcUserSession userSession, bool validateSessionId)
         {
-            if (sessionIdGenerator.ValidateSessionId(userSession))
+            if (validateSessionId)
             {
-                httpContextAccessor.HttpContext.Response.Cookies.Append(SessionName, userSession.SessionId, new CookieOptions
+                if (sessionIdGenerator.ValidateSessionId(userSession))
                 {
-                    Secure = true,
-                    IsEssential = true,
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
-                });
+                    CreateCookie(userSession);
+                }
+                else
+                {
+                    var message = $"SessionId not valid for session '{userSession?.SessionId}'";
+                    logger?.LogWarning(message);
+                    throw new ArgumentException(message, nameof(userSession));
+                }
             }
             else
             {
-                var message = $"SessionId not valid for session '{userSession?.SessionId}'";
-                logger?.LogWarning(message);
-                throw new ArgumentException(message, nameof(userSession));
+                CreateCookie(userSession);
             }
         }
 
@@ -108,6 +109,17 @@ namespace Dfc.Session
 
             formData.TryGetValue(key, out var stringValues);
             return stringValues.Count == 0 ? null : stringValues[0];
+        }
+
+        private void CreateCookie(DfcUserSession userSession)
+        {
+            httpContextAccessor.HttpContext.Response.Cookies.Append(SessionName, userSession.SessionId, new CookieOptions
+            {
+                Secure = true,
+                IsEssential = true,
+                HttpOnly = true,
+                SameSite = SameSiteMode.Strict,
+            });
         }
     }
 }
