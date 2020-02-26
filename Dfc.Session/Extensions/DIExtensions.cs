@@ -1,6 +1,5 @@
 ﻿using Dfc.Session.Models;
 using Dfc.Session.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 
