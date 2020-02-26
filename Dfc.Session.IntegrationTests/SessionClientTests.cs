@@ -27,6 +27,7 @@ namespace Dfc.Session.IntegrationTests
             sessionConfig = configuration.GetSection(nameof(SessionConfig)).Get<SessionConfig>();
 
             var serviceProvider = new ServiceCollection().AddSessionServices(sessionConfig);
+            serviceProvider.AddLogging();
             serviceProvider.AddHttpContextAccessor();
 
             var services = serviceProvider.BuildServiceProvider();
