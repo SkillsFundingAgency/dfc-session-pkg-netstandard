@@ -6,7 +6,7 @@
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
-    <ProjectGuid>{2684FFAD-EA96-479A-A65C-B5C259E24DD4}</ProjectGuid>
+    <ProjectGuid>{B0E239EA-898F-4595-95A4-58A5D79FF76C}</ProjectGuid>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>

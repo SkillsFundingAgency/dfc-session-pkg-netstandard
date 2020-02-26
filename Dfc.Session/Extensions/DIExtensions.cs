@@ -15,7 +15,6 @@ namespace Dfc.Session
             services.AddScoped<ISessionClient, SessionClient>();
             services.AddScoped<ISessionIdGenerator, SessionIdGenerator>();
             services.AddScoped<IPartitionKeyGenerator, PartitionKeyGenerator>();
-            services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
             services.AddLogging();
             return services;
         }
