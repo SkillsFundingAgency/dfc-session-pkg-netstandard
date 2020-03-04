@@ -113,7 +113,7 @@ namespace Dfc.Session
 
         private void CreateCookie(DfcUserSession userSession)
         {
-            httpContextAccessor.HttpContext.Response.Cookies.Append(SessionName, userSession.SessionId, new CookieOptions
+            httpContextAccessor.HttpContext.Response.Cookies.Append(SessionName, $"{userSession.PartitionKey}-{userSession.SessionId}", new CookieOptions
             {
                 Secure = true,
                 IsEssential = true,
