@@ -10,5 +10,7 @@ namespace Dfc.Session
         void CreateCookie(DfcUserSession userSession, bool validateSessionId);
 
         Task<string> TryFindSessionCode();
+
+        string GeneratePartitionKey(string sessionId);
     }
 }
