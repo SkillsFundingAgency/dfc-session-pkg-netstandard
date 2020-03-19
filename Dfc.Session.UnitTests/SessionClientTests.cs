@@ -273,5 +273,14 @@ namespace Dfc.Session.UnitTests
             // Assert
             Assert.Null(result);
         }
+
+        [Fact]
+        public void GeneratePartitionKeyUsesGeneratePartitionKeyWhenCalled()
+        {
+            const string sessionId = "DummySessionId";
+            sessionClient.GeneratePartitionKey(sessionId);
+            A.CallTo(() => partitionKeyGenerator.GeneratePartitionKey(A<string>.Ignored, sessionId))
+                .MustHaveHappened();
+        }
     }
 }

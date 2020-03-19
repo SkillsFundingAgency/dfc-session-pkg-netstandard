@@ -100,6 +100,11 @@ namespace Dfc.Session
             return string.IsNullOrWhiteSpace(sessionId) ? null : sessionId;
         }
 
+        public string GeneratePartitionKey(string sessionId)
+        {
+            return partitionKeyGenerator.GeneratePartitionKey(sessionConfig.ApplicationName, sessionId);
+        }
+
         private static string GetFormValue(string key, IFormCollection formData)
         {
             if (formData == null)
