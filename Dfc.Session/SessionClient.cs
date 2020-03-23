@@ -105,6 +105,11 @@ namespace Dfc.Session
             return partitionKeyGenerator.GeneratePartitionKey(sessionConfig.ApplicationName, sessionId);
         }
 
+        public bool ValidateUserSession(DfcUserSession dfcUserSession)
+        {
+            return sessionIdGenerator.ValidateSessionId(dfcUserSession);
+        }
+
         private static string GetFormValue(string key, IFormCollection formData)
         {
             if (formData == null)

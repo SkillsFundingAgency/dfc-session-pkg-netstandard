@@ -12,5 +12,7 @@ namespace Dfc.Session
         Task<string> TryFindSessionCode();
 
         string GeneratePartitionKey(string sessionId);
+
+        bool ValidateUserSession(DfcUserSession dfcUserSession);
     }
 }

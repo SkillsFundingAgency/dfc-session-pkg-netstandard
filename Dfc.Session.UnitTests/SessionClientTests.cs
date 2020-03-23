@@ -282,5 +282,28 @@ namespace Dfc.Session.UnitTests
             A.CallTo(() => partitionKeyGenerator.GeneratePartitionKey(A<string>.Ignored, sessionId))
                 .MustHaveHappened();
         }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ValidateUserSessionWhenCalledThenReturnsWhetherUserSessionIsValid(bool sessionIsValid)
+        {
+            // Arrange
+            var dfcUserSession = new DfcUserSession
+            {
+                CreatedDate = DateTime.UtcNow,
+                PartitionKey = "partitionKey",
+                Salt = "salt",
+                SessionId = "sessionId",
+            };
+            A.CallTo(() => sessionIdGenerator.ValidateSessionId(dfcUserSession)).Returns(sessionIsValid);
+
+            // Act
+            var result = sessionClient.ValidateUserSession(dfcUserSession);
+
+            // Assert
+            Assert.Equal(sessionIsValid, result);
+            A.CallTo(() => sessionIdGenerator.ValidateSessionId(dfcUserSession)).MustHaveHappenedOnceExactly();
+        }
     }
 }
