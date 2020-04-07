@@ -1,6 +1,5 @@
-﻿using System;
-using System.Net.NetworkInformation;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Dfc.Session.Models
 {

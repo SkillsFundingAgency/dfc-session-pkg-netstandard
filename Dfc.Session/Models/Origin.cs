@@ -4,6 +4,6 @@
     {
         Unknown = 0,
         Dysac = 1,
-        MatchSkills = 2
+        MatchSkills = 2,
     }
 }
