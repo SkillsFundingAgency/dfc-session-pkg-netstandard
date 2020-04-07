@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net.NetworkInformation;
+using Newtonsoft.Json;
 
 namespace Dfc.Session.Models
 {
@@ -11,5 +13,10 @@ namespace Dfc.Session.Models
         public string Salt { get; set; }
 
         public DateTime CreatedDate { get; set; }
+
+        public Origin Origin { get; set; }
+
+        [JsonIgnore]
+        public string GetCookieSessionId => $"{PartitionKey}-{SessionId}";
     }
 }

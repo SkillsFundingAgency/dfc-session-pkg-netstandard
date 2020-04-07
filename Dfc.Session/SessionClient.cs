@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using System.Web;
+using Newtonsoft.Json;
 
 namespace Dfc.Session
 {
@@ -70,7 +72,8 @@ namespace Dfc.Session
             var cookieSessionId = request.Cookies[SessionName];
             if (!string.IsNullOrWhiteSpace(cookieSessionId))
             {
-                sessionId = cookieSessionId;
+                var userSession = JsonConvert.DeserializeObject<DfcUserSession>(HttpUtility.UrlDecode(cookieSessionId));
+                sessionId = userSession.GetCookieSessionId;
             }
 
             var queryDictionary = System.Web.HttpUtility.ParseQueryString(request.QueryString.ToString());
@@ -123,7 +126,7 @@ namespace Dfc.Session
 
         private void CreateCookie(DfcUserSession userSession)
         {
-            httpContextAccessor.HttpContext.Response.Cookies.Append(SessionName, $"{userSession.PartitionKey}-{userSession.SessionId}", new CookieOptions
+            httpContextAccessor.HttpContext.Response.Cookies.Append(SessionName, $"{HttpUtility.UrlEncode(JsonConvert.SerializeObject(userSession))}", new CookieOptions
             {
                 Secure = true,
                 IsEssential = true,

@@ -7,7 +7,9 @@ using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Xunit;
+using System.Web;
 
 namespace Dfc.Session.IntegrationTests
 {
@@ -67,14 +69,20 @@ namespace Dfc.Session.IntegrationTests
         public async Task TryFindSessionCodeReturnsCookieValue()
         {
             // Arrange
-            const string sessionValue = "cookieSessionValue";
-            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { DefaultSessionName, sessionValue } });
+            var userSession = new DfcUserSession
+            {
+                SessionId = "DummySessionId",
+                Salt = "DummySalt",
+                PartitionKey = "DummyPartitionKey",
+            };
+            var userSessionJson = JsonConvert.SerializeObject(userSession);
+            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { DefaultSessionName, HttpUtility.UrlEncode(userSessionJson) } });
             contextAccessor.HttpContext = new DefaultHttpContext();
             contextAccessor.HttpContext.Request.Cookies = cookies;
 
             var result = await sessionClient.TryFindSessionCode().ConfigureAwait(false);
 
-            Assert.Equal(sessionValue, result);
+            Assert.Equal(userSession.GetCookieSessionId, result);
         }
 
         [Fact]
