@@ -113,5 +113,25 @@ namespace Dfc.Session.IntegrationTests
 
             Assert.Equal(sessionValue, result);
         }
+
+        [Fact]
+        public async Task GetUserSessionFromCookieReturnsUserSession()
+        {
+            // Arrange
+            var userSession = new DfcUserSession
+            {
+                SessionId = "DummySessionId",
+                Salt = "DummySalt",
+                PartitionKey = "DummyPartitionKey",
+            };
+            var userSessionJson = JsonConvert.SerializeObject(userSession);
+            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { DefaultSessionName, HttpUtility.UrlEncode(userSessionJson) } });
+            contextAccessor.HttpContext = new DefaultHttpContext();
+            contextAccessor.HttpContext.Request.Cookies = cookies;
+
+            var result = sessionClient.GetUserSessionFromCookie();
+
+            Assert.Equal(userSession.GetCookieSessionId, result.GetCookieSessionId);
+        }
     }
 }

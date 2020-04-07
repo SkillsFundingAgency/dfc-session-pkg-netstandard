@@ -14,5 +14,7 @@ namespace Dfc.Session
         string GeneratePartitionKey(string sessionId);
 
         bool ValidateUserSession(DfcUserSession dfcUserSession);
+
+        DfcUserSession GetUserSessionFromCookie();
     }
 }

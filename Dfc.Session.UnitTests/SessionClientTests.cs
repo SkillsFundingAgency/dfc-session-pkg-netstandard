@@ -327,5 +327,49 @@ namespace Dfc.Session.UnitTests
             Assert.Equal(sessionIsValid, result);
             A.CallTo(() => sessionIdGenerator.ValidateSessionId(dfcUserSession)).MustHaveHappenedOnceExactly();
         }
+
+        [Fact]
+        public void GetUserSessionFromCookieReturnsSessionWhenCookieExists()
+        {
+            // Arrange
+            var userSession = new DfcUserSession
+            {
+                SessionId = "DummySessionId",
+                Salt = "DummySalt",
+                CreatedDate = DateTime.UtcNow,
+                PartitionKey = "DummyPartitionKey",
+            };
+            var userSessionJson = JsonConvert.SerializeObject(userSession);
+            var httpContext = A.Fake<HttpContext>();
+            var localHttpContextAccessor = new HttpContextAccessor { HttpContext = httpContext };
+            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { SessionName, userSessionJson } });
+            A.CallTo(() => localHttpContextAccessor.HttpContext.Request.Cookies).Returns(cookies);
+
+            var localSessionClient = new SessionClient(sessionIdGenerator, partitionKeyGenerator, localHttpContextAccessor, config, logger);
+
+            // Act
+            var result = localSessionClient.GetUserSessionFromCookie();
+
+            // Assert
+            Assert.Equal(userSession.GetCookieSessionId, result.GetCookieSessionId);
+        }
+
+        [Fact]
+        public void GetUserSessionFromCookieReturnsNullWhenCookieDoesNotExist()
+        {
+            // Arrange
+            var httpContext = A.Fake<HttpContext>();
+            var localHttpContextAccessor = new HttpContextAccessor { HttpContext = httpContext };
+            var cookies = new RequestCookieCollection();
+            A.CallTo(() => localHttpContextAccessor.HttpContext.Request.Cookies).Returns(cookies);
+
+            var localSessionClient = new SessionClient(sessionIdGenerator, partitionKeyGenerator, localHttpContextAccessor, config, logger);
+
+            // Act
+            var result = localSessionClient.GetUserSessionFromCookie();
+
+            // Assert
+            Assert.Null(result);
+        }
     }
 }

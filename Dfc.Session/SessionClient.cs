@@ -113,6 +113,13 @@ namespace Dfc.Session
             return sessionIdGenerator.ValidateSessionId(dfcUserSession);
         }
 
+        public DfcUserSession GetUserSessionFromCookie()
+        {
+            var request = httpContextAccessor.HttpContext.Request;
+            var cookieSessionId = request.Cookies[SessionName];
+            return !string.IsNullOrWhiteSpace(cookieSessionId) ? JsonConvert.DeserializeObject<DfcUserSession>(HttpUtility.UrlDecode(cookieSessionId)) : null;
+        }
+
         private static string GetFormValue(string key, IFormCollection formData)
         {
             if (formData == null)
