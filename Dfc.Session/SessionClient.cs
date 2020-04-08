@@ -3,8 +3,10 @@ using Dfc.Session.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Dfc.Session
 {
@@ -70,7 +72,8 @@ namespace Dfc.Session
             var cookieSessionId = request.Cookies[SessionName];
             if (!string.IsNullOrWhiteSpace(cookieSessionId))
             {
-                sessionId = cookieSessionId;
+                var userSession = JsonConvert.DeserializeObject<DfcUserSession>(HttpUtility.UrlDecode(cookieSessionId));
+                sessionId = userSession.GetCookieSessionId;
             }
 
             var queryDictionary = System.Web.HttpUtility.ParseQueryString(request.QueryString.ToString());
@@ -110,6 +113,13 @@ namespace Dfc.Session
             return sessionIdGenerator.ValidateSessionId(dfcUserSession);
         }
 
+        public DfcUserSession GetUserSessionFromCookie()
+        {
+            var request = httpContextAccessor.HttpContext.Request;
+            var cookieSessionId = request.Cookies[SessionName];
+            return !string.IsNullOrWhiteSpace(cookieSessionId) ? JsonConvert.DeserializeObject<DfcUserSession>(HttpUtility.UrlDecode(cookieSessionId)) : null;
+        }
+
         private static string GetFormValue(string key, IFormCollection formData)
         {
             if (formData == null)
@@ -123,7 +133,7 @@ namespace Dfc.Session
 
         private void CreateCookie(DfcUserSession userSession)
         {
-            httpContextAccessor.HttpContext.Response.Cookies.Append(SessionName, $"{userSession.PartitionKey}-{userSession.SessionId}", new CookieOptions
+            httpContextAccessor.HttpContext.Response.Cookies.Append(SessionName, $"{HttpUtility.UrlEncode(JsonConvert.SerializeObject(userSession))}", new CookieOptions
             {
                 Secure = true,
                 IsEssential = true,

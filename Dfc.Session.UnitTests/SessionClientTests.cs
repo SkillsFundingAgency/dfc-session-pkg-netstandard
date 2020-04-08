@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Dfc.Session.UnitTests
@@ -129,10 +130,17 @@ namespace Dfc.Session.UnitTests
         public async Task TryFindSessionCodeUsesCookieSessionIdWhenItExists()
         {
             // Arrange
-            const string expectedCookieValue = "cookieValue";
+            var userSession = new DfcUserSession
+            {
+                SessionId = "DummySessionId",
+                Salt = "DummySalt",
+                CreatedDate = DateTime.UtcNow,
+                PartitionKey = "DummyPartitionKey",
+            };
+            var userSessionJson = JsonConvert.SerializeObject(userSession);
             var httpContext = A.Fake<HttpContext>();
             var localHttpContextAccessor = new HttpContextAccessor { HttpContext = httpContext };
-            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { SessionName, expectedCookieValue } });
+            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { SessionName, userSessionJson } });
             A.CallTo(() => localHttpContextAccessor.HttpContext.Request.Cookies).Returns(cookies);
 
             var localSessionClient = new SessionClient(sessionIdGenerator, partitionKeyGenerator, localHttpContextAccessor, config, logger);
@@ -141,7 +149,7 @@ namespace Dfc.Session.UnitTests
             var result = await localSessionClient.TryFindSessionCode().ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(expectedCookieValue, result);
+            Assert.Equal(userSession.GetCookieSessionId, result);
         }
 
         [Fact]
@@ -210,11 +218,18 @@ namespace Dfc.Session.UnitTests
             // Arrange
             const string formDataValue = "someFormData";
             const string expectedQueryStringValue = "qsValue";
-            const string expectedCookieValue = "cookieValue";
+            var userSession = new DfcUserSession
+            {
+                SessionId = "DummySessionId",
+                Salt = "DummySalt",
+                CreatedDate = DateTime.UtcNow,
+                PartitionKey = "DummyPartitionKey",
+            };
+            var userSessionJson = JsonConvert.SerializeObject(userSession);
             var httpContext = A.Fake<HttpContext>();
             var dummyQueryString = new QueryString($"?{SessionName.TrimStart('.')}={expectedQueryStringValue}");
             var formData = new FormCollection(new Dictionary<string, StringValues> { { SessionName.TrimStart('.'), new StringValues(formDataValue) } });
-            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { SessionName, expectedCookieValue } });
+            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { SessionName, userSessionJson } });
 
             var localHttpContextAccessor = new HttpContextAccessor { HttpContext = httpContext };
             A.CallTo(() => localHttpContextAccessor.HttpContext.Request.Cookies).Returns(cookies);
@@ -236,10 +251,17 @@ namespace Dfc.Session.UnitTests
         {
             // Arrange
             const string expectedQueryStringValue = "qsValue";
-            const string expectedCookieValue = "cookieValue";
+            var userSession = new DfcUserSession
+            {
+                SessionId = "DummySessionId",
+                Salt = "DummySalt",
+                CreatedDate = DateTime.UtcNow,
+                PartitionKey = "DummyPartitionKey",
+            };
+            var userSessionJson = JsonConvert.SerializeObject(userSession);
             var httpContext = A.Fake<HttpContext>();
             var dummyQueryString = new QueryString($"?{SessionName.TrimStart('.')}={expectedQueryStringValue}");
-            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { SessionName, expectedCookieValue } });
+            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { SessionName, userSessionJson } });
 
             var localHttpContextAccessor = new HttpContextAccessor { HttpContext = httpContext };
             A.CallTo(() => localHttpContextAccessor.HttpContext.Request.Cookies).Returns(cookies);
@@ -304,6 +326,50 @@ namespace Dfc.Session.UnitTests
             // Assert
             Assert.Equal(sessionIsValid, result);
             A.CallTo(() => sessionIdGenerator.ValidateSessionId(dfcUserSession)).MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public void GetUserSessionFromCookieReturnsSessionWhenCookieExists()
+        {
+            // Arrange
+            var userSession = new DfcUserSession
+            {
+                SessionId = "DummySessionId",
+                Salt = "DummySalt",
+                CreatedDate = DateTime.UtcNow,
+                PartitionKey = "DummyPartitionKey",
+            };
+            var userSessionJson = JsonConvert.SerializeObject(userSession);
+            var httpContext = A.Fake<HttpContext>();
+            var localHttpContextAccessor = new HttpContextAccessor { HttpContext = httpContext };
+            var cookies = new RequestCookieCollection(new Dictionary<string, string> { { SessionName, userSessionJson } });
+            A.CallTo(() => localHttpContextAccessor.HttpContext.Request.Cookies).Returns(cookies);
+
+            var localSessionClient = new SessionClient(sessionIdGenerator, partitionKeyGenerator, localHttpContextAccessor, config, logger);
+
+            // Act
+            var result = localSessionClient.GetUserSessionFromCookie();
+
+            // Assert
+            Assert.Equal(userSession.GetCookieSessionId, result.GetCookieSessionId);
+        }
+
+        [Fact]
+        public void GetUserSessionFromCookieReturnsNullWhenCookieDoesNotExist()
+        {
+            // Arrange
+            var httpContext = A.Fake<HttpContext>();
+            var localHttpContextAccessor = new HttpContextAccessor { HttpContext = httpContext };
+            var cookies = new RequestCookieCollection();
+            A.CallTo(() => localHttpContextAccessor.HttpContext.Request.Cookies).Returns(cookies);
+
+            var localSessionClient = new SessionClient(sessionIdGenerator, partitionKeyGenerator, localHttpContextAccessor, config, logger);
+
+            // Act
+            var result = localSessionClient.GetUserSessionFromCookie();
+
+            // Assert
+            Assert.Null(result);
         }
     }
 }
