@@ -28,7 +28,7 @@ stages:
       inputs:
         versionSpec: '>= 4.9.2'
 
-    - template: AzureDevOpsTemplates\Build\StepTemplates\dfc-dotnetcore-build-sonar.yml@dfc-devops
+    - template: AzureDevOpsTemplates\Build\StepTemplates\dfc-dotnetcore-build.yml@dfc-devops
       parameters:
         SolutionBaseName: $(SolutionBaseName)
         BuildPlatform: 'any cpu'
@@ -60,5 +60,5 @@ stages:
             inputs:
               command: push
               packagesToPush: '$(Pipeline.Workspace)\$(SolutionBaseName).Nuget\*.nupkg;!$(Pipeline.Workspace)\$(SolutionBaseName).Nuget\*.symbols.nupkg'
-              nuGetFeedType: external
-              publishFeedCredentials: 'DFC Nuget'
+              nuGetFeedType: internal
+              publishVstsFeed: 'NationalCareersService'
